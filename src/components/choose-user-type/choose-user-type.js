@@ -1,4 +1,4 @@
-const httpRequest = require('../services/http-request');
+const httpRequest = require('../../services/http-request');
 
 const chooseUserType = (userData) => {
   const promise = new Promise((resolve) => {

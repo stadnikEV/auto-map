@@ -4,7 +4,7 @@ const addElementsToMap = require('./util/add-elements-to-map');
 const packagingDataPassenger = require('./util/packaging-data-passenger');
 const createPoint = require('./util/create-point');
 const removePoint = require('./util/remove-point');
-const httpRequest = require('../../services/http-request');
+const saveData = require('./util/save-data');
 
 
 class MapPassenger {
@@ -24,7 +24,8 @@ class MapPassenger {
 
       keys.forEach((i) => {
         // создать точку
-        this._points[i] = createPoint.call(this, {
+        this._points[i] = createPoint({
+          googleMaps: this._googleMaps,
           pointName: i,
           coord: {
             lat: this._userData.passenger[i].lat,
@@ -32,7 +33,8 @@ class MapPassenger {
           },
         });
         // добавить точку на карту
-        addElementsToMap.call(this, {
+        addElementsToMap({
+          map: this._map,
           elements: [
             this._points[i].circle,
             this._points[i].marker,
@@ -52,12 +54,14 @@ class MapPassenger {
 
     const clickCoord = getClickCoord(e);
     // создать точку
-    this._points[pointName] = createPoint.call(this, {
+    this._points[pointName] = createPoint({
+      googleMaps: this._googleMaps,
       pointName,
       coord: clickCoord,
     });
     // добавить точку на карту
-    addElementsToMap.call(this, {
+    addElementsToMap({
+      map: this._map,
       elements: [
         this._points[pointName].circle,
         this._points[pointName].marker,
@@ -66,26 +70,18 @@ class MapPassenger {
 
     this._points[pointName].circle.addListener('click', removePoint.bind(this, { pointName }));
 
-    // если есть обе точки, отправить данные на сервер
+    // если есть обе точки, упаковать и сохранить данные на сервере
     if (this._points.A && this._points.B) {
       const userData = packagingDataPassenger({
         userName: this._userData.userName,
         points: this._points,
       });
-      this._searchStart(userData);
-    }
-  }
-
-
-  _searchStart(data) {
-    httpRequest({
-      url: './passenger',
-      data,
-    })
-      .then((response) => {
-        console.log(response);
+      // сохранение данных на сервере
+      saveData({
+        url: './passenger/save-data',
+        userData,
       });
-    this.a = null;
+    }
   }
 }
 

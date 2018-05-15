@@ -1,8 +1,8 @@
-import Map from './components/map/map';
-import login from './util/login';
-import registartion from './util/registartion';
-import chooseUserType from './util/choose-user-type';
-// import httpRequest from './services/http-request';
+import Map from '../map/map';
+import login from '../login/login';
+import registartion from '../registartion/registartion';
+import chooseUserType from '../choose-user-type/choose-user-type';
+
 
 require('./page.css');
 
@@ -13,7 +13,12 @@ export default class Page {
 
     login({ userName: this._userName })
       .then((userData) => {
-        // если пользователь не зарегистрирован
+        /*
+        *
+        *   если пользователь не зарегистрирован
+        *
+        */
+
         if (userData.userName === false) {
           // регистрация пользователя
           registartion({ userName: this._userName })
@@ -21,7 +26,7 @@ export default class Page {
               // регистрация прошла успешно
               if (userData.userName === this._userName && userData.userType === false) {
                 // выбор режима приложения (passenger или driver)
-                chooseUserType(userData)
+                chooseUserType({ userName: userData.userName })
                   .then((userData) => {
                     // инициализация компонета "map"
                     this._map = new Map({
@@ -34,9 +39,14 @@ export default class Page {
           return;
         }
 
-        // если пользователь зарегистрирован но нет данных "userType"
+        /*
+        *
+        *   если пользователь зарегистрирован но нет данных "userType"
+        *
+        */
+
         if (userData.userType === false) {
-          chooseUserType(userData)
+          chooseUserType({ userName: userData.userName })
             .then((userData) => {
               // инициализация компонета "map"
               this._map = new Map({
@@ -48,7 +58,12 @@ export default class Page {
           return;
         }
 
-        // если сервер отдал данные (passenger или driver)
+        /*
+        *
+        *   если сервер отдал данные "passenger" или "driver"
+        *
+        */
+
         this._map = new Map({
           el: document.querySelector('[data-component="map"]'),
           userData,

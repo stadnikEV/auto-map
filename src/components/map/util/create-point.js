@@ -1,16 +1,16 @@
 const createMarkerPassenger = require('./create-marker-passenger');
 const createCircle = require('./create-circle');
 
-function createPoint({ pointName, coord }) {
+function createPoint({ pointName, coord, googleMaps }) {
   const point = {};
   const circle = createCircle({
-    googleMaps: this._googleMaps,
+    googleMaps,
     center: coord,
     radius: 1000,
   });
 
   const marker = createMarkerPassenger({
-    googleMaps: this._googleMaps,
+    googleMaps,
     coord,
     label: pointName,
   });

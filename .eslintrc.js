@@ -43,7 +43,7 @@ module.exports = {
         "no-shadow": [
           "error",
           {
-            "allow": ["response", "userData", "userName"]
+            "allow": ["response", "userData"]
           }
         ]
     }

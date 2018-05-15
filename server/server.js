@@ -104,7 +104,7 @@ const server = ({ url, dataRequestJSON }) => {
     }
 
     // сохранение данных для режтма "passenger"
-    if (url === './passenger') {
+    if (url === './passenger/save-data') {
       userDataDB.userType = 'passenger';
       userDataDB.passenger = dataRequest.passenger;
 

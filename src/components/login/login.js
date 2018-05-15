@@ -1,4 +1,4 @@
-const httpRequest = require('../services/http-request');
+const httpRequest = require('../../services/http-request');
 
 const login = ({ userName }) => {
   const promise = new Promise((resolve) => {

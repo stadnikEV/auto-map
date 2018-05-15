@@ -1,7 +1,7 @@
 
-function addElementsToMap({ elements }) {
+function addElementsToMap({ elements, map }) {
   for (let i = 0; i < elements.length; i += 1) {
-    elements[i].setMap(this._map);
+    elements[i].setMap(map);
   }
 }
 
