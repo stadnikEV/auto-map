@@ -2,7 +2,7 @@ const httpRequest = require('../../services/http-request');
 
 const chooseUserType = (userData) => {
   const promise = new Promise((resolve) => {
-    userData.userType = 'passenger';
+    userData.userType = 'driver';
     httpRequest({
       url: './userType',
       data: userData,

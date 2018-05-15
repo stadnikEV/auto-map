@@ -1,7 +1,7 @@
 const createMarkerPassenger = require('./create-marker-passenger');
 const createCircle = require('./create-circle');
 
-function createPoint({ pointName, coord, googleMaps }) {
+function createPointPassenger({ pointName, coord, googleMaps }) {
   const point = {};
   const circle = createCircle({
     googleMaps,
@@ -21,4 +21,4 @@ function createPoint({ pointName, coord, googleMaps }) {
   return point;
 }
 
-module.exports = createPoint;
+module.exports = createPointPassenger;

@@ -1,5 +1,5 @@
 
-const addMarkerPassenger = ({
+const createMarkerPassenger = ({
   googleMaps,
   map,
   coord,
@@ -26,4 +26,4 @@ const addMarkerPassenger = ({
   return marker;
 };
 
-module.exports = addMarkerPassenger;
+module.exports = createMarkerPassenger;

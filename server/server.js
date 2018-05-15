@@ -52,17 +52,18 @@ const server = ({ url, dataRequestJSON }) => {
       }
 
       // отдать данные приложению если на сервере инициализирован режим 'driver'
-      // if (userData.userType !== 'driver') {
-      //   const data = {
-      //     userType: 'driver',
-      //     passenger: userData.driver,
-      //   };
-      //   response = JSON.stringify(data);
-      //   setTimeout(() => {
-      //     resolve(response);
-      //   }, 1000);
-      //   return;
-      // }
+      if (userDataDB.userType === 'driver') {
+        const responseData = {
+          userName: dataRequest.userName,
+          userType: 'driver',
+          driver: userDataDB.driver,
+        };
+
+        setTimeout(() => {
+          resolve(JSON.stringify(responseData));
+        }, 1000);
+        return;
+      }
     }
 
     /*

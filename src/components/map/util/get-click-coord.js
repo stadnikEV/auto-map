@@ -1,9 +1,9 @@
 
-const getClickCoord = (e) => {
-  const lat = e.latLng.lat();
-  const lng = e.latLng.lng();
+const getCoord = (obj) => {
+  const lat = obj.latLng.lat();
+  const lng = obj.latLng.lng();
 
   return { lat, lng };
 };
 
-module.exports = getClickCoord;
+module.exports = getCoord;

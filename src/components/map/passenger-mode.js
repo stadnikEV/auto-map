@@ -2,12 +2,12 @@ const getClickCoord = require('./util/get-click-coord');
 const definePointName = require('./util/define-point-name');
 const addElementsToMap = require('./util/add-elements-to-map');
 const packagingDataPassenger = require('./util/packaging-data-passenger');
-const createPoint = require('./util/create-point');
+const createPointPassenger = require('./util/create-point-passenger');
 const removePoint = require('./util/remove-point');
 const saveData = require('./util/save-data');
 
 
-class MapPassenger {
+class PassengerMode {
   constructor({ googleMaps, map, userData }) {
     this._googleMaps = googleMaps;
     this._map = map;
@@ -24,7 +24,7 @@ class MapPassenger {
 
       keys.forEach((i) => {
         // создать точку
-        this._points[i] = createPoint({
+        this._points[i] = createPointPassenger({
           googleMaps: this._googleMaps,
           pointName: i,
           coord: {
@@ -54,7 +54,7 @@ class MapPassenger {
 
     const clickCoord = getClickCoord(e);
     // создать точку
-    this._points[pointName] = createPoint({
+    this._points[pointName] = createPointPassenger({
       googleMaps: this._googleMaps,
       pointName,
       coord: clickCoord,
@@ -85,4 +85,4 @@ class MapPassenger {
   }
 }
 
-module.exports = MapPassenger;
+module.exports = PassengerMode;

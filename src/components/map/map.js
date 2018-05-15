@@ -40,8 +40,8 @@ export default class Map {
   // загрузка и инициализация функционала для режима "passenger"
   _initMapPassenger() {
     require.ensure(['./passenger-mode.js'], (require) => {
-      const MapPassenger = require('./passenger-mode.js');
-      this._mapPassenger = new MapPassenger({
+      const PassengerMode = require('./passenger-mode.js');
+      this._mapPassenger = new PassengerMode({
         googleMaps: this._googleMaps,
         map: this._map,
         userData: this._userData,
@@ -52,8 +52,8 @@ export default class Map {
   // загрузка и инициализация функционала для режима "driver"
   _initMapDriver() {
     require.ensure(['./driver-mode.js'], (require) => {
-      const MapDrive = require('./driver-mode.js');
-      this._mapDriver = new MapDrive({
+      const DriverMod = require('./driver-mode.js');
+      this._mapDriver = new DriverMod({
         googleMaps: this._googleMaps,
         map: this._map,
         userData: this._userData,
