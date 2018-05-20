@@ -1,3 +1,4 @@
+
 const packagingDataPassenger = ({ userName, points }) => {
   const data = {};
   data.userName = userName;

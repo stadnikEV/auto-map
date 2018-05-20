@@ -1,5 +1,5 @@
 
-const createMarkerDriver = ({
+const getMarkerDriver = ({
   googleMaps,
   map,
   coord,
@@ -14,7 +14,7 @@ const createMarkerDriver = ({
     },
   });
 
-  return { marker };
+  return marker;
 };
 
-module.exports = createMarkerDriver;
+module.exports = getMarkerDriver;

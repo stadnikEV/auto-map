@@ -1,10 +1,10 @@
-const getClickCoord = require('./util/get-click-coord');
+const httpRequest = require('../../services/http-request');
 const definePointName = require('./util/define-point-name');
-const addElementsToMap = require('./util/add-elements-to-map');
 const packagingDataPassenger = require('./util/packaging-data-passenger');
-const createPointPassenger = require('./util/create-point-passenger');
-const removePoint = require('./util/remove-point');
-const saveData = require('./util/save-data');
+const getMarkerPassenger = require('./util/get-marker-passenger');
+const getCircle = require('./util/get-circle');
+const removeElementFromMap = require('./util/remove-element-from-map');
+const getLatLng = require('./util/get-lat-lng');
 
 
 class PassengerMode {
@@ -17,31 +17,8 @@ class PassengerMode {
     this._map.addListener('click', this._onClick.bind(this));
 
     // если с сервера пришли данные о координатах точек, добавить их на карту
-
     if (this._userData.passenger) {
-      const obj = this._userData.passenger;
-      const keys = Object.keys(obj);
-
-      keys.forEach((i) => {
-        // создать точку
-        this._points[i] = createPointPassenger({
-          googleMaps: this._googleMaps,
-          pointName: i,
-          coord: {
-            lat: this._userData.passenger[i].lat,
-            lng: this._userData.passenger[i].lng,
-          },
-        });
-        // добавить точку на карту
-        addElementsToMap({
-          map: this._map,
-          elements: [
-            this._points[i].circle,
-            this._points[i].marker,
-          ],
-        });
-        this._points[i].circle.addListener('click', removePoint.bind(this, { pointName: i }));
-      });
+      this._renderUserData();
     }
   }
 
@@ -52,36 +29,101 @@ class PassengerMode {
 
     if (!pointName) return;
 
-    const clickCoord = getClickCoord(e);
-    // создать точку
-    this._points[pointName] = createPointPassenger({
-      googleMaps: this._googleMaps,
-      pointName,
-      coord: clickCoord,
-    });
-    // добавить точку на карту
-    addElementsToMap({
-      map: this._map,
-      elements: [
-        this._points[pointName].circle,
-        this._points[pointName].marker,
-      ],
-    });
+    const clickCoord = getLatLng(e.latLng);
 
-    this._points[pointName].circle.addListener('click', removePoint.bind(this, { pointName }));
+    this._createPoint({
+      coord: clickCoord,
+      pointName,
+    });
 
     // если есть обе точки, упаковать и сохранить данные на сервере
     if (this._points.A && this._points.B) {
-      const userData = packagingDataPassenger({
-        userName: this._userData.userName,
-        points: this._points,
-      });
-      // сохранение данных на сервере
-      saveData({
-        url: './passenger/save-data',
-        userData,
+      this._saveData();
+    }
+  }
+
+
+  _createPoint({ pointName, coord }) {
+    // создать точку
+    this._points[pointName] = this._getPoint({
+      googleMaps: this._googleMaps,
+      pointName,
+      coord,
+    });
+    // добавить точки на карту
+    this._points[pointName].circle.setMap(this._map);
+    this._points[pointName].marker.setMap(this._map);
+
+    this._points[pointName].circle.addListener('click', this._removePoint.bind(this, { pointName }));
+    this._points[pointName].marker.addListener('click', this._removePoint.bind(this, { pointName }));
+  }
+
+
+  _getPoint({ pointName, coord }) {
+    const point = {};
+    const circle = getCircle({
+      googleMaps: this._googleMaps,
+      center: coord,
+      radius: 1000,
+    });
+
+    const marker = getMarkerPassenger({
+      googleMaps: this._googleMaps,
+      coord,
+      label: pointName,
+    });
+
+    point.circle = circle;
+    point.marker = marker;
+
+    return point;
+  }
+
+
+  _removePoint({ pointName }) {
+    const keys = Object.keys(this._points[pointName]);
+
+    for (let i = 0; i < keys.length; i += 1) {
+      const element = this._points[pointName][keys[i]];
+      removeElementFromMap({
+        googleMaps: this._googleMaps,
+        element,
       });
     }
+    this._points[pointName] = null;
+  }
+
+
+  _saveData() {
+    const userData = packagingDataPassenger({
+      userName: this._userData.userName,
+      points: this._points,
+    });
+
+    httpRequest({
+      url: './passenger/save-data',
+      data: userData,
+    })
+      .then((response) => {
+        console.log('save data:', response);
+      });
+  }
+
+
+  _renderUserData() {
+    const obj = this._userData.passenger;
+    const keys = Object.keys(obj);
+
+    keys.forEach((i) => {
+      // создать точку
+      this._createPoint({
+        pointName: i,
+        coord: {
+          lat: this._userData.passenger[i].lat,
+          lng: this._userData.passenger[i].lng,
+        },
+      });
+    });
   }
 }
 

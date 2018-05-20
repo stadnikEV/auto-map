@@ -1,5 +1,5 @@
 
-const createCircle = ({
+const getCircle = ({
   googleMaps,
   center,
   radius,
@@ -19,4 +19,4 @@ const createCircle = ({
   return circle;
 };
 
-module.exports = createCircle;
+module.exports = getCircle;
