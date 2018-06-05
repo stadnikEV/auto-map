@@ -1,13 +1,10 @@
-
-const getMarkerDriver = ({
+export default ({
   googleMaps,
-  map,
   coord,
   label,
 }) => {
   const marker = new googleMaps.Marker({
     position: coord,
-    map,
     label: {
       text: label,
       color: 'white',
@@ -16,5 +13,3 @@ const getMarkerDriver = ({
 
   return marker;
 };
-
-module.exports = getMarkerDriver;

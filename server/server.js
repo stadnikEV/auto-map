@@ -1,5 +1,7 @@
+import searchDrivers from './search-drivers';
+import searchPassengers from './search-passengers';
 
-const server = ({ url, dataRequestJSON }) => {
+export default ({ url, dataRequestJSON }) => {
   const promise = new Promise((resolve) => {
     const dataRequest = JSON.parse(dataRequestJSON);
 
@@ -8,11 +10,8 @@ const server = ({ url, dataRequestJSON }) => {
 
 
     /*
-    *
     *   вход в приложение
-    *
     */
-
 
     if (url === './login') {
       // если пользователь не зарегистрирован
@@ -67,11 +66,8 @@ const server = ({ url, dataRequestJSON }) => {
     }
 
     /*
-    *
     *   регистрация пользователя
-    *
     */
-
 
     if (url === './registartion') {
       localStorage.setItem(dataRequest.userName, `{ "userName": "${dataRequest.userName}", "userType": false }`);
@@ -82,14 +78,11 @@ const server = ({ url, dataRequestJSON }) => {
       return;
     }
 
-
     /*
-    *
     *   сохранение данных в базу
-    *
     */
 
-    // сохранение данных о выбрвнном режиме "userType"
+    // получить данные для выбранного режима "userType"
     if (url === './userType') {
       userDataDB.userType = dataRequest.userType;
 
@@ -113,11 +106,75 @@ const server = ({ url, dataRequestJSON }) => {
       localStorage.setItem(dataRequest.userName, userDataDBJson);
 
       setTimeout(() => {
-        resolve(localStorage.getItem(dataRequest.userName));
+        resolve('data was saved');
+      }, 1000);
+    }
+
+
+    // сохранение данных для режтма "driver"
+    if (url === './driver/save-data') {
+      userDataDB.userType = 'driver';
+      userDataDB.driver = dataRequest.driver;
+
+      userDataDBJson = JSON.stringify(userDataDB);
+      localStorage.setItem(dataRequest.userName, userDataDBJson);
+
+      setTimeout(() => {
+        resolve('data was saved');
+      }, 1000);
+    }
+
+    /*
+    *   поиск для пассажира маршрутов
+    */
+
+    if (url === './passenger/start-search') {
+      userDataDB.userType = 'passenger';
+      userDataDB.passenger = dataRequest.passenger;
+
+      userDataDBJson = JSON.stringify(userDataDB);
+      localStorage.setItem(dataRequest.userName, userDataDBJson);
+
+      setTimeout(() => {
+        const userDataDriver = searchDrivers({
+          userDataPassenger: dataRequest,
+        });
+
+        if (!userDataDriver) {
+          resolve('matches was not found');
+          return;
+        }
+
+        resolve(userDataDriver);
+      }, 1000);
+    }
+
+    /*
+    *   поиск для водителя пассажиров
+    */
+
+    if (url === './driver/start-search') {
+      userDataDB.userType = 'driver';
+      userDataDB.driver = dataRequest.driver;
+
+      userDataDBJson = JSON.stringify(userDataDB);
+      localStorage.setItem(dataRequest.userName, userDataDBJson);
+
+      setTimeout(() => {
+        const userDataPassenger = searchPassengers({
+          userDataDriver: dataRequest,
+        });
+
+        if (!userDataPassenger) {
+          resolve('matches was not found');
+          return;
+        }
+
+        resolve(userDataPassenger);
       }, 1000);
     }
   });
+
+
   return promise;
 };
-
-module.exports = server;

@@ -1,6 +1,6 @@
-const httpRequest = require('../../services/http-request');
+import httpRequest from '../../services/http-request';
 
-const login = ({ userName }) => {
+export default ({ userName }) => {
   const promise = new Promise((resolve) => {
     httpRequest({
       url: './login',
@@ -14,5 +14,3 @@ const login = ({ userName }) => {
   });
   return promise;
 };
-
-module.exports = login;

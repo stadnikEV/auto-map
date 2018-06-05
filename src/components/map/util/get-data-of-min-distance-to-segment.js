@@ -1,5 +1,5 @@
 
-const getMinDistance = ({ point, pointSeg1, pointSeg2 }) => {
+export default ({ point, pointSeg1, pointSeg2 }) => {
   const getVector = (point1, point2) => {
     const vector = [];
     vector.x = point2.x - point1.x;
@@ -34,15 +34,14 @@ const getMinDistance = ({ point, pointSeg1, pointSeg2 }) => {
   }
 
   const b = c1 / c2;
-  const pointPerpendicular = [];
+  const pointPerpendicular = {};
   pointPerpendicular.x = pointSeg1.x + (vectorSeg.x * b);
   pointPerpendicular.y = pointSeg1.y + (vectorSeg.y * b);
 
   const vectorPerpendicular = getVector(point, pointPerpendicular);
+
   return {
     dist: dist(vectorPerpendicular),
     coord: pointPerpendicular,
   };
 };
-
-module.exports = getMinDistance;

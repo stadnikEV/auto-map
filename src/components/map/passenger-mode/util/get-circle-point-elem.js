@@ -1,5 +1,5 @@
 
-const getCircle = ({
+export default ({
   googleMaps,
   center,
   radius,
@@ -18,5 +18,3 @@ const getCircle = ({
 
   return circle;
 };
-
-module.exports = getCircle;

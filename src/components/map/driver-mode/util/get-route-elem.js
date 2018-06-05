@@ -1,5 +1,5 @@
 
-const getRoute = ({
+export default ({
   googleMaps,
   waypoints,
   start,
@@ -23,7 +23,6 @@ const getRoute = ({
       reject(status);
     });
   });
+
   return promise;
 };
-
-module.exports = getRoute;

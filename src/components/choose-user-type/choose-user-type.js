@@ -1,8 +1,7 @@
-const httpRequest = require('../../services/http-request');
+import httpRequest from '../../services/http-request';
 
-const chooseUserType = (userData) => {
+export default (userData) => {
   const promise = new Promise((resolve) => {
-    userData.userType = 'driver';
     httpRequest({
       url: './userType',
       data: userData,
@@ -15,5 +14,3 @@ const chooseUserType = (userData) => {
 
   return promise;
 };
-
-module.exports = chooseUserType;

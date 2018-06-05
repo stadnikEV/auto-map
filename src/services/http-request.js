@@ -1,6 +1,6 @@
-const server = require('../../server/server');
+import server from '../../server/server';
 
-const httpRequest = ({ url, data }) => {
+export default ({ url, data }) => {
   const dataRequestJSON = JSON.stringify(data);
   const promise = new Promise((resolve) => {
     server({ url, dataRequestJSON })
@@ -10,5 +10,3 @@ const httpRequest = ({ url, data }) => {
   });
   return promise;
 };
-
-module.exports = httpRequest;

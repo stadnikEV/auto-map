@@ -1,23 +1,23 @@
 
-const getMarkerWayPoint = ({
+export default ({
   googleMaps,
-  map,
   coord,
+  label,
+  color,
 }) => {
   const marker = new googleMaps.Marker({
     position: coord,
-    map,
     icon: {
       path: googleMaps.SymbolPath.CIRCLE,
-      strokeColor: 'blue',
-      strokeWeight: 1,
+      strokeColor: color,
+      strokeWeight: 3,
       fillColor: 'white',
-      fillOpacity: 0.9,
-      scale: 5,
+      fillOpacity: 0.8,
+      scale: 9,
     },
+    label,
+    clickable: false,
   });
 
   return marker;
 };
-
-module.exports = getMarkerWayPoint;
