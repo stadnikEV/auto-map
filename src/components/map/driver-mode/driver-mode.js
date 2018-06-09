@@ -8,13 +8,15 @@ import getDataOfClosestCoordOnPolyline from '../util/get-data-of-closest-coord-o
 import cutPolylinePath from './util/cut-polyline-path';
 import getPolylineElem from './util/get-polyline-elem';
 import getId from './util/get-id';
-import getwaypointIndex from './util/get-index-waypoint';
+import getWaypointIndex from './util/get-waypoint-index';
 import objIsEmpty from '../util/obj-is-empty';
 import packagingUserDataDriver from './util/packaging-user-data-driver';
 import fromPointToLatLng from '../util/from-point-to-latLng';
 import definePointName from '../util/define-point-name';
 import fromLatLngToPoint from '../util/from-latLng-to-point';
 import getStopoverPointElem from '../util/get-stopover-point-elem';
+import waypointIndexIsBetweenStopover from './util/waypoint-index-is-between-stopover';
+import getIndexOfExtremeStopovers from './util/get-index-of-extreme-stopovers';
 
 
 export default class DriverMod {
@@ -226,19 +228,25 @@ export default class DriverMod {
       const waypointId = getId({ elements: this._waypoints.id });
 
       // получить порядковый номер waypoint
-      const waypointIndex = getwaypointIndex({
+      const waypointIndex = getWaypointIndex({
         map: this._map,
         pointACoord: this._points.A.coord,
         pointBCoord: this._points.B.coord,
         waypoints: this._waypoints.coord,
         clickCoord: coord,
       });
+
+      // если waypoint между stopover, не создавать waypoint
+      const stopoversIndex = getIndexOfExtremeStopovers({ waypoints: this._waypoints.coord });
+      if (waypointIndexIsBetweenStopover({ waypointIndex, stopoversIndex })) {
+        return;
+      }
+
       const waypointElem = this._createWaypointElem({
         id: waypointId,
         index: waypointIndex,
         coord,
       });
-
 
       // необходимо если getRoute вернул "ZERO_RESULTS".
       this._lastCreatedElem = { waypointId };
@@ -535,6 +543,27 @@ export default class DriverMod {
   }
 
   /*
+  *   спрятаять waypoints которых находятся между двух крайних stopoverPoints
+  */
+
+  _hideWaypointsBeetwenStopover() {
+    const stopoversIndex = getIndexOfExtremeStopovers({ waypoints: this._waypoints.coord });
+
+    this._waypoints.coord.forEach((waypoint, i) => {
+      if (waypoint.stopover === true) return;
+
+      if (waypointIndexIsBetweenStopover({
+        waypointIndex: i,
+        stopoversIndex,
+      })) {
+        const mapElementId = this._waypoints.id[i];
+        this._waypoints.mapElements[mapElementId].setClickable(false);
+        this._waypoints.mapElements[mapElementId].setOpacity(0);
+      }
+    });
+  }
+
+  /*
   *   создание елементов stopoverPoints, сохранение данных, помещение элемента на карту
   */
 
@@ -556,7 +585,7 @@ export default class DriverMod {
       const stopoverPointsId = getId({ elements: this._waypoints.id });
 
       // получить порядковый номер waypoint
-      const stopoverPointsIndex = getwaypointIndex({
+      const stopoverPointsIndex = getWaypointIndex({
         map: this._map,
         pointACoord: this._points.A.coord,
         pointBCoord: this._points.B.coord,
@@ -643,6 +672,7 @@ export default class DriverMod {
             passengerIndex: i,
           });
         });
+        this._hideWaypointsBeetwenStopover();
       });
   }
 

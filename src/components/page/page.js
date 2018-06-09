@@ -9,7 +9,7 @@ require('./page.css');
 export default class Page {
   constructor(el) {
     this._el = el;
-    this._userName = 'user1';
+    this._userName = 'user2';
 
     login({ userName: this._userName })
       .then((userData) => {
