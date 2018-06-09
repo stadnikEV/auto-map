@@ -28,7 +28,13 @@ export default class PassengerMode {
     this._subscribe.startSearch = PubSub.subscribe('startSearch', this._startSearch.bind(this, { url: './passenger/start-search' }));
   }
 
+
   _onClickMap(e) {
+    if (this._radiusСhangesName) {
+      this._onCircleChangeEnd({ pointName: this._radiusСhangesName });
+      return;
+    }
+
     if (this._points.A.mapElements && this._points.B.mapElements) return;
 
     const pointName = definePointName({ points: this._points });
@@ -56,6 +62,33 @@ export default class PassengerMode {
     }
   }
 
+
+  _onClickCircle(pointName) {
+    const markerElem = this._points[pointName].mapElements.markerPointElem;
+    const circleElem = this._points[pointName].mapElements.circlePointElem;
+
+    if (this._radiusСhangesName) {
+      this._onCircleChangeEnd({ pointName: this._radiusСhangesName });
+      return;
+    }
+    this._radiusСhangesName = pointName;
+
+    if (this._points.A.mapElements) {
+      this._points.A.mapElements.markerPointElem.setClickable(false);
+    }
+    if (this._points.B.mapElements) {
+      this._points.B.mapElements.markerPointElem.setClickable(false);
+    }
+
+    markerElem.setOpacity(0);
+    circleElem.setEditable(true);
+    circleElem.setOptions({
+      fillOpacity: 0.2,
+      strokeColor: 'black',
+      strokeWeight: 1,
+    });
+  }
+
   /*
   *   создание елемента point, сохранение данных, помещение элемента на карту
   */
@@ -67,16 +100,16 @@ export default class PassengerMode {
       mapElements: {},
     };
 
-    const markerPointElem = getMarkerPointElem({
-      googleMaps: this._googleMaps,
-      coord,
-      label: pointName,
-    });
-
     const circlePointElem = getCirclePointElem({
       googleMaps: this._googleMaps,
       center: coord,
       radius,
+    });
+
+    const markerPointElem = getMarkerPointElem({
+      googleMaps: this._googleMaps,
+      coord,
+      label: pointName,
     });
 
     point.mapElements.markerPointElem = markerPointElem;
@@ -100,7 +133,55 @@ export default class PassengerMode {
     });
 
     markerPointElem.addListener('click', this._onClickPoint.bind(this, pointName));
-    circlePointElem.addListener('click', this._onClickPoint.bind(this, pointName));
+    circlePointElem.addListener('click', this._onClickCircle.bind(this, pointName));
+
+    circlePointElem.addListener('radius_changed', this._onCircleChangeEnd.bind(this, { pointName }));
+    circlePointElem.addListener('center_changed', this._onCircleChangeEnd.bind(this, { pointName }));
+  }
+
+  _onCircleChangeEnd({ pointName }) {
+    this._radiusСhangesName = null;
+
+    const markerElem = this._points[pointName].mapElements.markerPointElem;
+    const circleElem = this._points[pointName].mapElements.circlePointElem;
+
+    if (this._points.A.mapElements) {
+      this._points.A.mapElements.markerPointElem.setClickable(true);
+    }
+    if (this._points.B.mapElements) {
+      this._points.B.mapElements.markerPointElem.setClickable(true);
+    }
+
+    markerElem.setOpacity(1);
+    circleElem.setEditable(false);
+    circleElem.setOptions({
+      fillOpacity: 0.5,
+      strokeWeight: 2,
+      strokeColor: 'white',
+    });
+
+    const circleCenter = circleElem.getCenter();
+    const circleRadius = circleElem.getRadius();
+
+    if (circleCenter.lat() !== this._points[pointName].coord.lat()) {
+      markerElem.setPosition(circleCenter);
+      this._points[pointName].coord = circleCenter;
+
+      this._sendToServer({ url: './passenger/save-data' });
+      return;
+    }
+
+    if (circleRadius !== this._points[pointName].radius) {
+      this._points[pointName].radius = circleRadius;
+      const radiusWorldCoord = getCircleRadiusWorldCoord({
+        googleMaps: this._googleMaps,
+        map: this._map,
+        circleElem,
+      });
+      this._points[pointName].radiusWorldCoord = radiusWorldCoord;
+
+      this._sendToServer({ url: './passenger/save-data' });
+    }
   }
 
   /*

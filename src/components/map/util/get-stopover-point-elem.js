@@ -10,14 +10,16 @@ export default ({
     icon: {
       path: googleMaps.SymbolPath.CIRCLE,
       strokeColor: color,
-      strokeWeight: 3,
+      strokeWeight: 2,
       fillColor: 'white',
       fillOpacity: 0.8,
-      scale: 9,
+      scale: 6,
     },
     label,
     clickable: false,
   });
+
+  marker.setZIndex(100);
 
   return marker;
 };
