@@ -1,0 +1,37 @@
+.button {
+  font: 15px arial, sans-serif;
+  cursor: pointer;
+  transition: color 0.25s ease-out;
+}
+
+
+.button-login-page, .button-registration-page {
+  color: rgb(140, 140, 141);
+  border: none;
+  background-color: rgb(247, 247, 247);
+  height: 100%;
+  padding: 0 30px;
+ }
+
+.button-login-page:hover, .button-registration-page:hover {
+  color: rgb(67, 108, 255);
+  background-color: white;
+}
+.button-login-page_selected {
+  background-color: rgb(255, 119, 116);
+  color: white;
+  cursor: default;
+  transition: none;
+}
+.button-login-page_selected:hover {
+  background-color: rgb(255, 119, 116);
+  color: white;
+}
+
+
+@media all and (max-height: 600px), all and (max-width: 600px) {
+  .button-login-page, .button-registration-page {
+    font-size: 11px;
+    padding: 0 10px;
+   }
+}

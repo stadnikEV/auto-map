@@ -1,0 +1,27 @@
+.header {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: rgb(247, 247, 247);
+}
+
+.header_application {
+  border-bottom: solid 2px rgb(39, 171, 255);
+}
+
+.header__button-login-page-container, .header__button-registration-page-container {
+  float: right;
+  height: 100%;
+}
+
+.header__logo-container {
+  height: 100%;
+  float: left;
+  margin-left: 20px;
+}
+
+@media all and (max-height: 600px), all and (max-width: 600px) {
+  .header__logo-container {
+    margin-left: 10px;
+  }
+}

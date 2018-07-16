@@ -1,0 +1,44 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  overflow: hidden;
+}
+
+.page {
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.page__header-container {
+  z-index: 3;
+  width: 100%;
+  height: 8%;
+}
+
+.page__main-container {
+  z-index: 2;
+  width: 100%;
+}
+.page__main-container_show-main {
+  height: 100%;
+}
+.page__main-container_show-main-header {
+  height: 92%;
+}
+.page__main-container_show-main-header-footer {
+  height: 87%;
+}
+
+
+.page__footer-container {
+  z-index: 3;
+  height: 5%;
+  width: 100%;
+}
+.hidden {
+  display: none;
+}

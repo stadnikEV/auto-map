@@ -3,6 +3,9 @@ module.exports = {
         "browser": true,
         "es6": true
     },
+    "settings": {
+      "import/resolver": "webpack"
+    },
     "extends": "airbnb-base",
     "parserOptions": {
         "sourceType": "module"
