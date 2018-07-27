@@ -1,27 +1,29 @@
 import PubSub from 'pubsub-js';
-import Login from '../login-registration/login';
-import Registration from '../login-registration/registration';
+import BaseComponent from 'sharedDriver/js/base/base-component';
+import 'sharedDriver/css/base/reset.scss'; // css
+import 'sharedDriver/css/base/base.scss'; // css
+import './style.scss'; // css
 import Header from '../header';
-import Footer from '../footer';
 import Map from '../map';
-import BadHash from '../bad-hash';
 import template from './template.hbs';
 
-require('./style.css');
 
-export default class Page {
+export default class Page extends BaseComponent {
   constructor({ el }) {
-    this.el = el;
+    super({ el });
     this.components = {};
     this.eventsPubSub = {};
 
     this.render();
-    this.page = document.querySelector('[data-component="page"]');
-    this.headerContainer = this.page.querySelector('[data-element="page__header-container"]');
-    this.mainContainer = this.page.querySelector('[data-element="page__main-container"]');
-    this.footerContainer = this.page.querySelector('[data-element="page__footer-container"]');
+    this.elements.page = document.querySelector('[data-component="page"]');
+    this.elements.headerContainer = this.elements.page.querySelector('[data-element="page__header-container"]');
+    this.elements.mainContainer = this.elements.page.querySelector('[data-element="page__main-container"]');
 
     this.addEvents();
+  }
+
+  render() {
+    this.el.innerHTML = template();
   }
 
   addEvents() {
@@ -29,7 +31,7 @@ export default class Page {
   }
 
   removeEvents() {
-    PubSub.unsubscribe(this.eventsPubSub.hashChange);
+    this.unsubscribe();
   }
 
   onHashChange(msg, { hash }) {
@@ -37,114 +39,88 @@ export default class Page {
       this.initBadHash();
       return;
     }
-
-    if (this.mainComponentName) {
-      this.removeComponent({ componentName: this.mainComponentName });
+    if (this.currentMainComponentName) {
+      this.removeComponent({ componentName: this.currentMainComponentName });
     }
-
     if (!this.components.header) {
       this.initHeader({ hash });
     }
-
     if (hash === 'application') {
       this.initApplication();
       return;
     }
-
-    if (hash === 'login' || hash === 'registration') {
-      if (this.lastHash === 'application') {
-        this.removeComponent({ componentName: 'footer' });
-      }
-      if (hash === 'login') {
-        this.initLogin();
-        return;
-      }
-      if (hash === 'registration') {
-        this.initRegistration();
-      }
+    if (hash === 'login') {
+      this.initLogin();
+      return;
     }
-  }
-
-  initBadHash() {
-    this.removeAllComponents();
-    this.components.badHash = new BadHash({ el: this.mainContainer });
-    this.setCssMainContainer();
-    this.lastHash = 'badHash';
-    this.mainComponentName = 'badHash';
+    if (hash === 'registration') {
+      this.initRegistration();
+    }
   }
 
   initHeader({ hash }) {
     this.components.header = new Header({
-      el: this.headerContainer,
+      el: this.elements.headerContainer,
       hash,
     });
   }
 
   initApplication() {
-    this.components.map = new Map({ el: this.mainContainer });
-    this.components.footer = new Footer({ el: this.footerContainer });
-    this.setCssAllContainers();
+    this.components.map = new Map({ el: this.elements.mainContainer });
+    this.showMainAndHeaderContainers();
     this.lastHash = 'application';
-    this.mainComponentName = 'map';
+    this.currentMainComponentName = 'map';
   }
 
   initLogin() {
-    this.components.login = new Login({ el: this.mainContainer });
-    this.setCssMainHeaderContainers();
-    this.lastHash = 'login';
-    this.mainComponentName = 'login';
+    import(/* webpackChunkName: "login-driver" */ '../login')
+      .then((Module) => {
+        this.components.login = new Module({ el: this.elements.mainContainer });
+        this.showMainAndHeaderContainers();
+        this.lastHash = 'login';
+        this.currentMainComponentName = 'login';
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   initRegistration() {
-    this.components.registration = new Registration({ el: this.mainContainer });
-    this.setCssMainHeaderContainers();
-    this.lastHash = 'registration';
-    this.mainComponentName = 'registration';
+    import(/* webpackChunkName: "registration-driver" */ '../registration')
+      .then((Module) => {
+        this.components.registration = new Module({ el: this.elements.mainContainer });
+        this.showMainAndHeaderContainers();
+        this.lastHash = 'registration';
+        this.currentMainComponentName = 'registration';
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
-  setCssMainContainer() {
-    this.headerContainer.classList.add('hidden');
-    this.footerContainer.classList.add('hidden');
-    this.mainContainer.classList.add('page__main-container_show-main');
-    this.mainContainer.classList.remove('page__main-container_show-main-header');
-    this.mainContainer.classList.remove('page__main-container_show-main-header-footer');
+  initBadHash() {
+    import(/* webpackChunkName: "bad-hash" */ '../bad-hash')
+      .then((Module) => {
+        this.removeAllComponents();
+        this.components.badHash = new Module({ el: this.elements.mainContainer });
+        this.showOnlyMainContainer();
+        this.lastHash = 'badHash';
+        this.currentMainComponentName = 'badHash';
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
-  setCssMainHeaderContainers() {
-    this.headerContainer.classList.remove('hidden');
-    this.footerContainer.classList.add('hidden');
-    this.mainContainer.classList.remove('page__main-container_show-main');
-    this.mainContainer.classList.add('page__main-container_show-main-header');
-    this.mainContainer.classList.remove('page__main-container_show-main-header-footer');
+  showOnlyMainContainer() {
+    this.hide({ el: this.elements.headerContainer });
+    this.elements.mainContainer.classList.add('page__main-container_show-main');
+    this.elements.mainContainer.classList.remove('page__main-container_show-main-header');
   }
 
-  setCssAllContainers() {
-    this.headerContainer.classList.remove('hidden');
-    this.footerContainer.classList.remove('hidden');
-    this.mainContainer.classList.remove('page__main-container_show-main');
-    this.mainContainer.classList.remove('page__main-container_show-main-header');
-    this.mainContainer.classList.add('page__main-container_show-main-header-footer');
-  }
-
-  render() {
-    this.el.innerHTML = template();
-  }
-
-  removeComponent({ componentName }) {
-    this.components[componentName].destroy();
-    delete this.components[componentName];
-  }
-
-  removeAllComponents() {
-    const componentNames = Object.keys(this.components);
-    componentNames.forEach((componentName) => {
-      this.removeComponent({ componentName });
-    });
-  }
-
-  destroy() {
-    this.removeEvents();
-    this.removeAllComponents();
-    this.el.innerHTML = '';
+  showMainAndHeaderContainers() {
+    this.show({ el: this.elements.headerContainer });
+    this.elements.mainContainer.classList.remove('page__main-container_show-main');
+    this.elements.mainContainer.classList.add('page__main-container_show-main-header');
   }
 }

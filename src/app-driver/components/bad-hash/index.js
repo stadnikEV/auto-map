@@ -1,20 +1,16 @@
+import BaseComponent from 'sharedDriver/js/base/base-component';
 import template from './template.hbs';
+import './style.scss'; // css
 
-require('./style.css');
-
-export default class Header {
+class BadHash extends BaseComponent {
   constructor({ el }) {
-    this.el = el;
-    this.components = {};
-
+    super({ el });
     this.render();
   }
 
   render() {
     this.el.innerHTML = template();
   }
-
-  destroy() {
-    this.el.innerHTML = '';
-  }
 }
+
+module.exports = BadHash;

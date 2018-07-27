@@ -1,10 +1,41 @@
 import PubSub from 'pubsub-js';
-import onSetHash from './on-set-hash';
-import onHashChange from './on-hash-change';
+import hashConfig from './hash-config';
 
 export default class Router {
   constructor() {
-    window.addEventListener('hashchange', onHashChange);
-    PubSub.subscribe('setHash', onSetHash.bind(this));
+    this.onHashChange = this.onHashChange.bind(this);
+    window.addEventListener('hashchange', this.onHashChange);
+  }
+
+
+  isCorrectHash({ currentHash }) {
+    let isCorrectHash = false;
+    hashConfig.forEach((referenceHash) => {
+      if (referenceHash === currentHash) {
+        isCorrectHash = true;
+      }
+    });
+    return isCorrectHash;
+  }
+
+  onHashChange() {
+    const currentHash = Router.getHash();
+    if (this.isCorrectHash({ currentHash })) {
+      PubSub.publish('hashChange', { hash: currentHash });
+      return;
+    }
+    Router.setHash({ hash: 'badHash' });
+  }
+
+  static getHash() {
+    const route = window.location.hash;
+    return route.slice(1);
+  }
+
+  static setHash({ hash }) {
+    if (Router.getHash() === hash) {
+      return;
+    }
+    window.location.hash = `#${hash}`;
   }
 }

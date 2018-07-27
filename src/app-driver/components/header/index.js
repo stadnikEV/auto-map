@@ -1,23 +1,21 @@
 import PubSub from 'pubsub-js';
+import BaseComponent from 'sharedDriver/js/base/base-component';
 import Logo from '../logo';
-import ButtonLoginPage from '../buttons/button-login-page';
-import ButtonRegistrationPage from '../buttons/button-registration-page';
+import ButtonHeader from '../buttons/button-header';
 import template from './template.hbs';
+import './style.scss'; // css
 
-require('./style.css');
-
-export default class Header {
+export default class Header extends BaseComponent {
   constructor({ el, hash }) {
-    this.el = el;
-    this.eventsPubSub = {};
+    super({ el });
     this.components = {};
+    this.eventsPubSub = {};
 
     this.render();
-
-    this.header = document.querySelector('[data-component="header"]');
-    this.logoContainer = this.header.querySelector('[data-element="header__logo-container"]');
-    this.buttonLoginPageContainer = this.header.querySelector('[data-element="header__button-login-page-container"]');
-    this.buttonRegistrationPageContainer = this.header.querySelector('[data-element="header__button-registration-page-container"]');
+    this.elements.header = document.querySelector('[data-component="header"]');
+    this.elements.logoContainer = this.elements.header.querySelector('[data-element="header__logo-container"]');
+    this.elements.buttonLoginContainer = this.elements.header.querySelector('[data-element="header__button-header-login-container"]');
+    this.elements.buttonRegistrationContainer = this.elements.header.querySelector('[data-element="header__button-header-registration-container"]');
 
     this.addEvents();
 
@@ -33,7 +31,7 @@ export default class Header {
   }
 
   removeEvents() {
-    PubSub.unsubscribe(this.eventsPubSub.hashChange);
+    this.unsubscribe();
   }
 
   onHashChange(msg, { hash }) {
@@ -41,9 +39,9 @@ export default class Header {
       if (this.lastHash === 'login' || this.lastHash === 'registration') {
         return;
       }
-      this.buttonRegistrationPageInit();
-      this.buttonLoginPageInit();
-      this.header.classList.remove('header_application');
+      this.buttonRegistrationInit();
+      this.buttonLoginInit();
+      this.elements.header.classList.remove('header_application');
     }
 
     if (hash === 'application') {
@@ -53,7 +51,7 @@ export default class Header {
       if (this.components.buttonRegistrationPage) {
         this.removeComponent({ componentName: 'buttonRegistrationPage' });
       }
-      this.header.classList.add('header_application');
+      this.elements.header.classList.add('header_application');
     }
 
     if (!this.components.logo) {
@@ -63,32 +61,26 @@ export default class Header {
   }
 
   logoInit() {
-    this.components.logo = new Logo({ el: this.logoContainer });
+    this.components.logo = new Logo({ el: this.elements.logoContainer });
   }
 
-  buttonLoginPageInit() {
-    this.components.buttonLoginPage = new ButtonLoginPage({ el: this.buttonLoginPageContainer });
-  }
-
-  buttonRegistrationPageInit() {
-    this.components.buttonRegistrationPage = new ButtonRegistrationPage({ el: this.buttonRegistrationPageContainer });
-  }
-
-  removeComponent({ componentName }) {
-    this.components[componentName].destroy();
-    delete this.components[componentName];
-  }
-
-  removeAllComponents() {
-    const componentNames = Object.keys(this.components);
-    componentNames.forEach((componentName) => {
-      this.removeComponent({ componentName });
+  buttonLoginInit() {
+    this.components.buttonLoginPage = new ButtonHeader({
+      el: this.elements.buttonLoginContainer,
+      value: 'ВХОД',
+      hashName: 'login',
+      componentName: 'button-header-login',
+      tabindex: 'tabindex="2"',
     });
   }
 
-  destroy() {
-    this.removeEvents();
-    this.removeAllComponents();
-    this.el.innerHTML = '';
+  buttonRegistrationInit() {
+    this.components.buttonRegistrationPage = new ButtonHeader({
+      el: this.elements.buttonRegistrationContainer,
+      value: 'СОЗДАТЬ АККАУНТ',
+      hashName: 'registration',
+      componentName: 'button-header-registration',
+      tabindex: 'tabindex="3"',
+    });
   }
 }

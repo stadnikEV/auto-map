@@ -1,18 +1,29 @@
-<form data-component="form-login"
-      class="form-login">
-  <input type="email"
-         name="email"
-         placeholder="Почта"
-         class="input form-login__email"
-         required>
-  <input type="password"
-         name="password"
-         placeholder="Пароль"
-         class="input form-login__password"
-         required>
-  <input type="submit"
-         name="submit"
-         value="ВОЙТИ"
-         class="button form-login__submit"
-         data-element="form-login__submit">
+<form class="form-login"
+      data-component="form-login">
+
+  <label class="form-label form-login__label"
+         for="email">
+  Почта
+  </label>
+  <div class="form-login__tip-container"
+       data-element="form-login__tip-email-container">
+  </div>
+  <div class="form-login__email-container"
+       data-element="form-login__email-container">
+  </div>
+
+  <label class="form-label form-login__label"
+         for="password">
+  Пароль
+  </label>
+  <div class="form-login__tip-container"
+       data-element="form-login__tip-password-container">
+  </div>
+  <div class="form-login__password-container"
+       data-element="form-login__password-container">
+  </div>
+
+  <div class="form-login__submit-container"
+       data-element="form-login__submit-container">
+  </div>
 </form>

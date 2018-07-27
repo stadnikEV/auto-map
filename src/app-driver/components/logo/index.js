@@ -1,30 +1,21 @@
-// import PubSub from 'pubsub-js';
-import imgDriver from 'logo/driver.svg';
-import template from './template.hbs';
+import BaseComponent from 'sharedDriver/js/base/base-component';
+import imgDriver from './img/driver.svg'; // svg
+import template from './template.hbs'; // template
+import './style.scss'; // css
 
-require('./style.css');
 
-
-export default class Logo {
+export default class Logo extends BaseComponent {
   constructor({ el }) {
-    this.el = el;
+    super({ el });
     this.eventsPubSub = {};
 
     this.render();
+    this.elements.logo = document.querySelector('[data-component="logo"]');
+    this.elements.logoImg = this.elements.logo.querySelector('[data-element="logo__img"]');
 
-    this.logo = document.querySelector('[data-component="logo"]');
-
-    // this.onClick = onClick.bind(this);
-    // this.addEvents();
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.addEvents();
   }
-
-  // addEvents() {
-  //   this.logo.addEventListener('click', this.onClick);
-  // }
-  //
-  // removeEvents() {
-  //   this.button.removeEventListener('click', this.onClick);
-  // }
 
   render() {
     this.el.innerHTML = template({
@@ -33,8 +24,24 @@ export default class Logo {
     });
   }
 
-  destroy() {
-    // this.removeEvents();
-    this.el.innerHTML = '';
+  addEvents() {
+    this.elements.logo.addEventListener('mousedown', this.onMouseDown); // запрет outline при клике
+    this.elements.logoImg.ondragstart = () => false; // запрет dragstart
+  }
+
+  removeEvents() {
+    this.elements.logo.removeEventListener('mousedown', this.onMouseDown);
+    this.elements.logoImg.ondragstart = null;
+  }
+
+  onMouseDown(e) {
+    const linkElem = e.target.closest('[data-element="logo__link"]');
+    if (!linkElem) {
+      return;
+    }
+    if (!this.elements.logo.contains(linkElem)) {
+      return;
+    }
+    e.preventDefault();
   }
 }

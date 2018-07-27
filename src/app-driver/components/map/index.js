@@ -1,17 +1,17 @@
 // import PubSub from 'pubsub-js';
 import loadGoogleMapsApi from 'load-google-maps-api';
+import BaseComponent from 'sharedDriver/js/base/base-component';
 import template from './template.hbs';
+import './style.scss'; // css
 
-require('./style.css');
 
-
-export default class Map {
+export default class Map extends BaseComponent {
   constructor({ el }) {
-    this.el = el;
+    super({ el });
     this.components = {};
 
     this.render();
-    this.map = document.querySelector('[data-component="map"]');
+    this.elements.map = document.querySelector('[data-component="map"]');
 
     // инициализация google map API
     loadGoogleMapsApi({
@@ -19,7 +19,7 @@ export default class Map {
     })
       .then((googleMaps) => {
         this._googleMaps = googleMaps;
-        this._map = new googleMaps.Map(this.map, {
+        this._map = new googleMaps.Map(this.elements.map, {
           center: {
             lat: 50.448853,
             lng: 30.513346,
@@ -51,9 +51,6 @@ export default class Map {
 
   render() {
     this.el.innerHTML = template();
-  }
-  destroy() {
-    this.el.innerHTML = '';
   }
 
   /*

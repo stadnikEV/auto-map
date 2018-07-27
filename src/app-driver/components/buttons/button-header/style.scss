@@ -1,0 +1,25 @@
+@import 'app-driver/components/__shared/css/base/variables.scss';
+
+.button-header {
+  font-size: 60%;
+  color: $gray;
+  background-color: $white;
+  padding: 0 10px;
+
+  &:hover, {
+    color: $blue;
+    background-color: white;
+  }
+
+  &_selected {
+    background-color: $red;
+    color: white;
+    cursor: default;
+    transition: none;
+  }
+
+  &_selected:hover {
+    background-color: $red;
+    color: white;
+  }
+}

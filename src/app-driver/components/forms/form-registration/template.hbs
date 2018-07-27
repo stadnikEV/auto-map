@@ -1,33 +1,40 @@
-<form class="form-registration">
-      <input type="text"
-             placeholder="Имя"
-             class="input form-registration__name"
-             required>
-      <p class="form-registration__tip-email hidden"
-        data-element="form-registration__tip-email">
-      </p>
-      <input type="email"
-             placeholder="Почта"
-             class="input form-registration__email"
-             required>
-      <p class="form-registration__tip-password hidden"
-       data-element="form-registration__tip-password">
-      </p>
-      <input type="password"
-             name="password"
-             placeholder="Пароль"
-             class="input form-registration__password"
-             required>
-      <p class="form-registration__tip-password hidden"
-      data-element="form-registration__tip-password">
-      </p>
-      <input type="password"
-             name="password"
-             placeholder="Повторите пароль"
-             class="input form-registration__password-confirmation"
-             required>
-      <input type="submit"
-             name="submit"
-             value="ДАЛЕЕ"
-             class="button form-registration__submit">
+<form class="form-registration"
+      data-component="form-registration">
+
+  <label class="form-label form-registration__label"
+         for="name">
+  Имя:
+  </label>
+  <div class="form-registration__tip-container"
+       data-element="form-registration__tip-name-container">
+  </div>
+  <div class="form-registration__name-container"
+       data-element="form-registration__name-container">
+  </div>
+
+  <label class="form-label form-registration__label"
+         for="email">
+  Почта
+  </label>
+  <div class="form-registration__tip-container"
+       data-element="form-registration__tip-email-container">
+  </div>
+  <div class="form-registration__email-container"
+       data-element="form-registration__email-container">
+  </div>
+
+  <label class="form-label form-registration__label"
+         for="password">
+  Пароль
+  </label>
+  <div class="form-registration__tip-container"
+       data-element="form-registration__tip-password-container">
+  </div>
+  <div class="form-registration__password-container"
+       data-element="form-registration__password-container">
+  </div>
+
+  <div class="form-registration__submit-container"
+       data-element="form-registration__submit-container">
+  </div>
 </form>

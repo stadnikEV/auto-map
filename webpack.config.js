@@ -1,6 +1,8 @@
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const routes = require('./webpack-static-server/routes');
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+
 
 const NODE_ENV = process.env.NODE_ENV || 'dev';
 
@@ -11,6 +13,8 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
+    chunkFilename: '[name].js',
+    publicPath: 'http://localhost:3000/',
     path: path.join(__dirname, 'dist/'),
   },
   module: {
@@ -36,6 +40,29 @@ module.exports = {
         loader: 'handlebars-loader',
       },
       {
+        test: /\.css$/,
+        loaders: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              includePaths: [
+                path.join(__dirname, 'src'),
+              ],
+            },
+          },
+        ],
+      },
+      {
         test: /\.(png|jpg|gif|svg)$/,
         use: [
           {
@@ -50,13 +77,22 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      children: true,
+      async: 'common',
+      minChunks: 2,
+    }),
+  ],
   resolve: {
     modules: [
-      'src/images/',
-      'utils',
+      'src/utils',
       'node_modules',
     ],
-    extensions: ['.js', '.css', '.svg'],
+    extensions: ['.js', '.css'],
+    alias: {
+      sharedDriver: path.resolve(__dirname, 'src/app-driver/components/__shared'),
+    },
   },
 };
 
@@ -72,21 +108,8 @@ if (NODE_ENV === 'dev') {
       routes(app);
     },
   };
-  // module.exports.plugins = [
-  //   new HtmlWebpackPlugin({
-  //     filename: 'index.html',
-  //     template: './src/app-selection/index.html',
-  //     chunks: ['selection'],
-  //   }),
-  //   new HtmlWebpackPlugin({
-  //     filename: 'driver.html',
-  //     template: './src/app-driver/driver.html',
-  //     chunks: ['driver'],
-  //   }),
-  // ];
-  module.exports.module.rules.push({
-    test: /\.css$/,
-    // loader: 'style-loader!css-loader?modules',
-    loaders: ['style-loader', 'css-loader'],
-  });
+}
+
+if (NODE_ENV === 'prod') {
+  module.exports.plugins.push(new UglifyJsPlugin());
 }
