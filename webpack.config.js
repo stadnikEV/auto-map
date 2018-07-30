@@ -86,12 +86,12 @@ module.exports = {
   ],
   resolve: {
     modules: [
-      'src/utils',
+      'src',
       'node_modules',
     ],
     extensions: ['.js', '.css'],
     alias: {
-      sharedDriver: path.resolve(__dirname, 'src/app-driver/components/__shared'),
+      sharedDriver: path.resolve(__dirname, 'src'),
     },
   },
 };
