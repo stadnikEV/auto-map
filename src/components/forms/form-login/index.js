@@ -1,4 +1,3 @@
-import PubSub from 'pubsub-js';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/form/style.scss'; // css
 import './style.scss'; // css
@@ -13,7 +12,6 @@ export default class FormLogin extends BaseComponent {
   constructor({ el }) {
     super({ el });
     this.components = {};
-    this.eventsPubSub = {};
 
     this.render();
     this.elements.form = document.querySelector('[data-component="form-login"]');
@@ -25,6 +23,8 @@ export default class FormLogin extends BaseComponent {
 
     this.initComponentInputEmail();
     this.initComponentInputPassword();
+    this.initComponentTipEmail();
+    this.initComponentTipPassword();
     this.initComponentButtonSubmit();
 
     this.onClick = this.onClick.bind(this);
@@ -38,14 +38,13 @@ export default class FormLogin extends BaseComponent {
 
   addEvents() {
     this.elements.form.addEventListener('click', this.onClick);
-    this.eventsPubSub.responseValidationEmail = PubSub.subscribe('responseValidationEmail', this.onValidation.bind(this));
-    this.eventsPubSub.responseValidationPassword = PubSub.subscribe('responseValidationPassword', this.onValidation.bind(this));
   }
+
 
   removeEvents() {
     this.elements.form.removeEventListener('click', this.onClick);
-    this.unsubscribe();
   }
+
 
   onClick(e) {
     const submit = e.target.closest('[data-component="button-submit-login"]');
@@ -56,80 +55,51 @@ export default class FormLogin extends BaseComponent {
       }
       e.preventDefault(); // запрещает срабатывание события "submit"
 
-      PubSub.publish('requestValidationEmail');
-      PubSub.publish('requestValidationPassword');
+      const emailStatus = this.components.inputEmail.validation();
+      const passwordStatus = this.components.inputPassword.validation();
 
-      console.log('click');
+      this.tipHendler({
+        isValid: emailStatus.isValid,
+        message: emailStatus.message,
+        tipName: 'tipEmail',
+      });
+      this.tipHendler({
+        isValid: passwordStatus.isValid,
+        message: passwordStatus.message,
+        tipName: 'tipPassword',
+      });
+
+      this.setFocus({
+        isValidEmail: emailStatus.isValid,
+        isValidPassword: passwordStatus.isValid,
+      });
+
+      if (emailStatus.isValid
+      && passwordStatus.isValid) {
+        console.log('submit');
+      }
     }
   }
 
-  onValidation(msg, { status }) {
-    if (msg === 'responseValidationEmail') {
-      this.isValidEmail = status.isValid;
-      this.tipEmailHendler({
-        isValid: status.isValid,
-        message: status.message,
-      });
-    }
-
-    if (msg === 'responseValidationPassword') {
-      this.isValidPassword = status.isValid;
-      this.tipPasswordHendler({
-        isValid: status.isValid,
-        message: status.message,
-      });
-    }
-
-    if (this.isValidEmail === undefined // сработали оба события
-    || this.isValidPassword === undefined) {
+  tipHendler({ isValid, message, tipName }) {
+    if (isValid) {
+      this.components[tipName].showTip({ message: '' });
       return;
     }
-
-    this.setFocus();
-
-    if (this.isValidEmail // если поля валидные
-    && this.isValidPassword) {
-      console.log('submit');
-    }
-
-    delete this.isValidEmail;
-    delete this.isValidPassword;
+    this.components[tipName].showTip({ message });
   }
 
-  setFocus() {
-    if (!this.isValidEmail) {
-      PubSub.publish('setFocusEmail');
+
+  setFocus({ isValidEmail, isValidPassword }) {
+    if (!isValidEmail) {
+      this.components.inputEmail.setFocus();
       return;
     }
-    if (!this.isValidPassword) {
-      PubSub.publish('setFocusPassword');
+    if (!isValidPassword) {
+      this.components.inputPassword.setFocus();
       return;
     }
     document.activeElement.blur();
-  }
-
-  tipEmailHendler({ isValid, message }) {
-    if (isValid && this.components.tipEmail) {
-      PubSub.publish('showTipEmail', { message: '' });
-    }
-    if (!isValid) {
-      if (!this.components.tipEmail) {
-        this.initComponentTipEmail();
-      }
-      PubSub.publish('showTipEmail', { message });
-    }
-  }
-
-  tipPasswordHendler({ isValid, message }) {
-    if (isValid && this.components.tipPassword) {
-      PubSub.publish('showTipPassword', { message: '' });
-    }
-    if (!isValid) {
-      if (!this.components.tipPassword) {
-        this.initComponentTipPassword();
-      }
-      PubSub.publish('showTipPassword', { message });
-    }
   }
 
 
@@ -138,48 +108,40 @@ export default class FormLogin extends BaseComponent {
       el: this.elements.emailContainer,
       componentName: 'input-email',
       id: 'email',
-      events: {
-        subscribeValidation: 'requestValidationEmail',
-        subscribeSetFocus: 'setFocusEmail',
-        publishValidation: 'responseValidationEmail',
-      },
     });
   }
+
 
   initComponentInputPassword() {
     this.components.inputPassword = new InputPassword({
       el: this.elements.passwordContainer,
       componentName: 'input-password',
       id: 'password',
-      events: {
-        subscribeValidation: 'requestValidationPassword',
-        subscribeSetFocus: 'setFocusPassword',
-        publishValidation: 'responseValidationPassword',
-      },
     });
   }
 
-  initComponentButtonSubmit() {
-    this.components.buttonSubmit = new ButtonSubmit({
-      el: this.elements.buttonSubmitContainer,
-      value: 'ВОЙТИ',
-      componentName: 'button-submit-login',
-    });
-  }
 
   initComponentTipEmail() {
     this.components.tipEmail = new TipInline({
       el: this.elements.tipEmailContainer,
       componentName: 'tip-inline-email',
-      subscribeEvent: 'showTipEmail',
     });
   }
+
 
   initComponentTipPassword() {
     this.components.tipPassword = new TipInline({
       el: this.elements.tipPasswordContainer,
       componentName: 'tip-inline-password',
-      subscribeEvent: 'showTipPassword',
+    });
+  }
+
+
+  initComponentButtonSubmit() {
+    this.components.buttonSubmit = new ButtonSubmit({
+      el: this.elements.buttonSubmitContainer,
+      componentName: 'button-submit-login',
+      value: 'ВОЙТИ',
     });
   }
 }

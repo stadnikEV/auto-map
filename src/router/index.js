@@ -8,10 +8,10 @@ export default class Router {
   }
 
 
-  isCorrectHash({ currentHash }) {
+  isCorrectHash({ currentRouteHash }) {
     let isCorrectHash = false;
-    hashConfig.forEach((referenceHash) => {
-      if (referenceHash === currentHash) {
+    hashConfig.forEach((referenceRouteHash) => {
+      if (referenceRouteHash === currentRouteHash) {
         isCorrectHash = true;
       }
     });
@@ -19,23 +19,23 @@ export default class Router {
   }
 
   onHashChange() {
-    const currentHash = Router.getHash();
-    if (this.isCorrectHash({ currentHash })) {
-      PubSub.publish('hashChange', { hash: currentHash });
+    const currentRouteHash = Router.getRouteHash();
+    if (this.isCorrectHash({ currentRouteHash })) {
+      PubSub.publish('routeHashChange', { routeHash: currentRouteHash });
       return;
     }
-    Router.setHash({ hash: 'badHash' });
+    Router.setRouteHash({ routeHash: 'badHash' });
   }
 
-  static getHash() {
-    const route = window.location.hash;
-    return route.slice(1);
+  static getRouteHash() {
+    const routeHash = window.location.hash;
+    return routeHash.slice(1);
   }
 
-  static setHash({ hash }) {
-    if (Router.getHash() === hash) {
+  static setRouteHash({ routeHash }) {
+    if (Router.getRouteHash() === routeHash) {
       return;
     }
-    window.location.hash = `#${hash}`;
+    window.location.hash = `#${routeHash}`;
   }
 }

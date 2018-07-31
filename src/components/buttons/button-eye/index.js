@@ -1,4 +1,3 @@
-import PubSub from 'pubsub-js';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/button/style.scss'; // css
 import './style.scss'; // css
@@ -8,16 +7,10 @@ import template from './template.hbs';
 
 
 export default class ButtonEye extends BaseComponent {
-  constructor({
-    el,
-    componentName,
-    publishEventShow,
-    publishEventHide,
-  }) {
+  constructor({ el, componentName, clickHendler }) {
     super({ el });
 
-    this.publishEventShow = publishEventShow;
-    this.publishEventHide = publishEventHide;
+    this.clickHendler = clickHendler;
 
     this.render({ componentName });
     this.elements.button = document.querySelector(`[data-component="${componentName}"]`);
@@ -49,15 +42,15 @@ export default class ButtonEye extends BaseComponent {
 
   onClick() {
     if (!this.isPasswordShown) {
-      PubSub.publish(this.publishEventShow);
       this.isPasswordShown = true;
       this.show({ el: this.elements.imgHide });
       this.hide({ el: this.elements.imgShow });
+      this.clickHendler({ isShown: true });
       return;
     }
-    PubSub.publish(this.publishEventHide);
     this.isPasswordShown = false;
     this.show({ el: this.elements.imgShow });
     this.hide({ el: this.elements.imgHide });
+    this.clickHendler({ isShown: false });
   }
 }

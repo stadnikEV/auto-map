@@ -8,7 +8,7 @@ const NODE_ENV = process.env.NODE_ENV || 'dev';
 
 module.exports = {
   entry: {
-    selection: './src/app-selection/app.js',
+    // selection: './src/app-selection/app.js',
     driver: './src/app-driver/app.js',
   },
   output: {

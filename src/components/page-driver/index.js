@@ -1,11 +1,11 @@
 import PubSub from 'pubsub-js';
 import BaseComponent from 'components/__shared/base-component';
-import Header from '../header';
-import Map from '../map';
-import template from './template.hbs'; // template
-import './reset.scss'; // css
-import './base.scss'; // css
+import 'components/__shared/css/reset.scss'; // css
+import 'components/__shared/css/base.scss'; // css
 import './style.scss'; // css
+import Header from '../header';
+import Map from '../map-driver';
+import template from './template.hbs'; // template
 
 
 export default class Page extends BaseComponent {
@@ -27,15 +27,15 @@ export default class Page extends BaseComponent {
   }
 
   addEvents() {
-    this.eventsPubSub.hashChange = PubSub.subscribe('hashChange', this.onHashChange.bind(this));
+    this.eventsPubSub.hashChange = PubSub.subscribe('routeHashChange', this.onHashChange.bind(this));
   }
 
   removeEvents() {
     this.unsubscribe();
   }
 
-  onHashChange(msg, { hash }) {
-    if (hash === 'badHash') {
+  onHashChange(msg, { routeHash }) {
+    if (routeHash === 'badHash') {
       this.initBadHash();
       return;
     }
@@ -43,32 +43,31 @@ export default class Page extends BaseComponent {
       this.removeComponent({ componentName: this.currentMainComponentName });
     }
     if (!this.components.header) {
-      this.initHeader({ hash });
+      this.initHeader();
     }
-    if (hash === 'application') {
+    if (routeHash === 'application') {
       this.initApplication();
       return;
     }
-    if (hash === 'login') {
+    if (routeHash === 'login') {
       this.initLogin();
       return;
     }
-    if (hash === 'registration') {
+    if (routeHash === 'registration') {
       this.initRegistration();
     }
   }
 
-  initHeader({ hash }) {
+  initHeader() {
     this.components.header = new Header({
       el: this.elements.headerContainer,
-      hash,
     });
   }
 
   initApplication() {
     this.components.map = new Map({ el: this.elements.mainContainer });
     this.showMainAndHeaderContainers();
-    this.lastHash = 'application';
+    this.lastRouteHash = 'application';
     this.currentMainComponentName = 'map';
   }
 
@@ -77,11 +76,11 @@ export default class Page extends BaseComponent {
       .then((Module) => {
         this.components.login = new Module({ el: this.elements.mainContainer });
         this.showMainAndHeaderContainers();
-        this.lastHash = 'login';
+        this.lastRouteHash = 'login';
         this.currentMainComponentName = 'login';
       })
       .catch((err) => {
-        console.log(err);
+        console.warn(err);
       });
   }
 
@@ -90,11 +89,11 @@ export default class Page extends BaseComponent {
       .then((Module) => {
         this.components.registration = new Module({ el: this.elements.mainContainer });
         this.showMainAndHeaderContainers();
-        this.lastHash = 'registration';
+        this.lastRouteHash = 'registration';
         this.currentMainComponentName = 'registration';
       })
       .catch((err) => {
-        console.log(err);
+        console.warn(err);
       });
   }
 
@@ -104,11 +103,11 @@ export default class Page extends BaseComponent {
         this.removeAllComponents();
         this.components.badHash = new Module({ el: this.elements.mainContainer });
         this.showOnlyMainContainer();
-        this.lastHash = 'badHash';
+        this.lastRouteHash = 'badHash';
         this.currentMainComponentName = 'badHash';
       })
       .catch((err) => {
-        console.log(err);
+        console.warn(err);
       });
   }
 

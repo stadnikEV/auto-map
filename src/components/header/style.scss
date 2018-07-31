@@ -1,4 +1,4 @@
-@import 'components/__shared/variables.scss';
+@import 'components/__shared/css/variables.scss';
 
 .header {
   width: 100%;
@@ -6,9 +6,6 @@
   box-sizing: border-box;
   background-color: $white;
 
-  &_application {
-    // border-bottom: solid 2px $light-blue;
-  }
   &__button-header-container {
     float: right;
     height: 100%;

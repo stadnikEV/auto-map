@@ -14,7 +14,7 @@ export default class InputEmail extends BaseComponent {
     this.elements.input.classList.add('input_invalid');
   }
 
-  onSetFocus() {
+  setFocus() {
     this.elements.input.focus();
   }
 }

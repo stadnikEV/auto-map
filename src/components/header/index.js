@@ -1,4 +1,5 @@
 import PubSub from 'pubsub-js';
+import Router from 'router';
 import BaseComponent from 'components/__shared/base-component';
 import Logo from '../logo';
 import ButtonHeader from '../buttons/button-header';
@@ -6,7 +7,7 @@ import template from './template.hbs';
 import './style.scss'; // css
 
 export default class Header extends BaseComponent {
-  constructor({ el, hash }) {
+  constructor({ el }) {
     super({ el });
     this.components = {};
     this.eventsPubSub = {};
@@ -17,9 +18,11 @@ export default class Header extends BaseComponent {
     this.elements.buttonLoginContainer = this.elements.header.querySelector('[data-element="header__button-header-login-container"]');
     this.elements.buttonRegistrationContainer = this.elements.header.querySelector('[data-element="header__button-header-registration-container"]');
 
+    this.logoInit();
+
     this.addEvents();
 
-    this.onHashChange(null, { hash });
+    this.onHashChange(null, { routeHash: Router.getRouteHash() });
   }
 
   render() {
@@ -27,37 +30,34 @@ export default class Header extends BaseComponent {
   }
 
   addEvents() {
-    this.eventsPubSub.hashChange = PubSub.subscribe('hashChange', this.onHashChange.bind(this));
+    this.eventsPubSub.hashChange = PubSub.subscribe('routeHashChange', this.onHashChange.bind(this));
   }
 
   removeEvents() {
     this.unsubscribe();
   }
 
-  onHashChange(msg, { hash }) {
-    if (hash === 'login' || hash === 'registration') {
-      if (this.lastHash === 'login' || this.lastHash === 'registration') {
-        return;
+  onHashChange(msg, { routeHash }) {
+    if (routeHash === 'login' || routeHash === 'registration') {
+      if (this.lastRouteHash !== 'login' && this.lastRouteHash !== 'registration') {
+        this.buttonRegistrationInit();
+        this.buttonLoginInit();
+        delete this.selectedButtonName;
       }
-      this.buttonRegistrationInit();
-      this.buttonLoginInit();
-      this.elements.header.classList.remove('header_application');
     }
 
-    if (hash === 'application') {
-      if (this.components.buttonLoginPage) {
-        this.removeComponent({ componentName: 'buttonLoginPage' });
+    if (routeHash === 'application') {
+      if (this.components.buttonLogin) {
+        this.removeComponent({ componentName: 'buttonLogin' });
       }
-      if (this.components.buttonRegistrationPage) {
-        this.removeComponent({ componentName: 'buttonRegistrationPage' });
+      if (this.components.buttonRegistration) {
+        this.removeComponent({ componentName: 'buttonRegistration' });
       }
-      this.elements.header.classList.add('header_application');
+      delete this.selectedButtonName;
     }
 
-    if (!this.components.logo) {
-      this.logoInit();
-    }
-    this.lastHash = hash;
+    this.backlightButtons({ routeHash });
+    this.lastRouteHash = routeHash;
   }
 
   logoInit() {
@@ -65,22 +65,37 @@ export default class Header extends BaseComponent {
   }
 
   buttonLoginInit() {
-    this.components.buttonLoginPage = new ButtonHeader({
+    this.components.buttonLogin = new ButtonHeader({
       el: this.elements.buttonLoginContainer,
       value: 'ВХОД',
-      hashName: 'login',
+      publishRouteHash: 'login',
       componentName: 'button-header-login',
       tabindex: 'tabindex="2"',
     });
   }
 
   buttonRegistrationInit() {
-    this.components.buttonRegistrationPage = new ButtonHeader({
+    this.components.buttonRegistration = new ButtonHeader({
       el: this.elements.buttonRegistrationContainer,
       value: 'СОЗДАТЬ АККАУНТ',
-      hashName: 'registration',
+      publishRouteHash: 'registration',
       componentName: 'button-header-registration',
       tabindex: 'tabindex="3"',
     });
+  }
+
+  backlightButtons({ routeHash }) {
+    if (this.selectedButtonName) {
+      this.components[this.selectedButtonName].deselectButton();
+    }
+    if (routeHash === 'login') {
+      this.components.buttonLogin.selectButton();
+      this.selectedButtonName = 'buttonLogin';
+      return;
+    }
+    if (routeHash === 'registration') {
+      this.components.buttonRegistration.selectButton();
+      this.selectedButtonName = 'buttonRegistration';
+    }
   }
 }
