@@ -1,4 +1,4 @@
-import Router from 'router';
+import router from 'router';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/button/style.scss'; // css
 import './style.scss'; // css
@@ -19,7 +19,7 @@ export default class ButtonHeader extends BaseComponent {
     this.render({ value, componentName, tabindex });
     this.elements.button = document.querySelector(`[data-component="${componentName}"]`);
 
-    this.setRouteHash = Router.setRouteHash.bind(null, { routeHash: publishRouteHash });
+    this.setRouteHash = router.setRouteHash.bind(router, { routeHash: publishRouteHash });
     this.addEvents();
   }
 

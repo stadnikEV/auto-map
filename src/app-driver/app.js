@@ -1,5 +1,5 @@
 import Page from 'components/page-driver';
-import Router from '../router';
+import router from '../router';
 
 new Page({ el: document.body });
-new Router();
+router.initRouteHash();

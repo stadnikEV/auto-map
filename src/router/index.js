@@ -1,41 +1,77 @@
 import PubSub from 'pubsub-js';
-import hashConfig from './hash-config';
+import simbiozApi from 'simbioz-api';
+import getAllowedRouteHash from './get-allowed-route-hash';
+import isCorrectHash from './is-correct-hash';
 
-export default class Router {
-  constructor() {
-    this.onHashChange = this.onHashChange.bind(this);
-    window.addEventListener('hashchange', this.onHashChange);
+const initRouter = () => {
+  if (window.router) {
+    return window.router;
   }
 
+  class Router {
+    constructor() {
+      this.onHashChange = this.onHashChange.bind(this);
+      window.addEventListener('hashchange', this.onHashChange);
+    }
 
-  isCorrectHash({ currentRouteHash }) {
-    let isCorrectHash = false;
-    hashConfig.forEach((referenceRouteHash) => {
-      if (referenceRouteHash === currentRouteHash) {
-        isCorrectHash = true;
+
+    onHashChange() {
+      const currentRouteHash = this.getRouteHash();
+      if (!isCorrectHash({ currentRouteHash })) {
+        this.setRouteHash({ routeHash: 'badHash' });
+        return;
       }
-    });
-    return isCorrectHash;
-  }
 
-  onHashChange() {
-    const currentRouteHash = Router.getRouteHash();
-    if (this.isCorrectHash({ currentRouteHash })) {
+      const allowedRouteHash = getAllowedRouteHash({
+        currentRouteHash,
+        userStatus: this.userStatus,
+      });
+
+      const isAllowedRouteHash = allowedRouteHash.some((route) => {
+        const result = (currentRouteHash === route);
+        return result;
+      });
+
+      if (!isAllowedRouteHash) {
+        this.setRouteHash({ routeHash: allowedRouteHash[0] });
+        return;
+      }
+
       PubSub.publish('routeHashChange', { routeHash: currentRouteHash });
-      return;
     }
-    Router.setRouteHash({ routeHash: 'badHash' });
+
+    initRouteHash() {
+      simbiozApi.userStatus()
+        .then((userStatus) => {
+          this.userStatus = userStatus;
+
+          this.onHashChange();
+        })
+        .catch((err) => {
+          console.warn(err);
+        });
+    }
+
+    getRouteHash() {
+      const routeHash = window.location.hash;
+      return routeHash.slice(1);
+    }
+
+    setRouteHash({ routeHash }) {
+      const currentRouteHash = this.getRouteHash();
+      if (currentRouteHash === routeHash) {
+        return;
+      }
+      window.location.hash = `#${routeHash}`;
+    }
+
+    setUserStatus(userStatus) {
+      this.userStatus = userStatus;
+    }
   }
 
-  static getRouteHash() {
-    const routeHash = window.location.hash;
-    return routeHash.slice(1);
-  }
+  window.router = new Router();
+  return window.router;
+};
 
-  static setRouteHash({ routeHash }) {
-    if (Router.getRouteHash() === routeHash) {
-      return;
-    }
-    window.location.hash = `#${routeHash}`;
-  }
-}
+export default initRouter();

@@ -4,6 +4,10 @@ const routes = (app) => {
   app.set('views', path.join(__dirname, 'templates'));
   app.set('view engine', 'ejs');
 
+  app.use((req, res, next) => {
+    console.log(req.url);
+    next();
+  });
   app.get('/driver', (req, res) => {
     res.set('Cache-Control', 'no-cache');
     res.render('driver');
@@ -14,8 +18,6 @@ const routes = (app) => {
   });
 
   app.use((req, res, next) => {
-    console.log(`url: ${req.url}`);
-
     const regExp = new RegExp('^.*.(js$|svg$)'); // если запрос файлов, пердать управление следующему middleware(static)
     if (req.url.search(regExp) !== -1) {
       next();

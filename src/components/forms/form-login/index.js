@@ -1,3 +1,4 @@
+import PubSub from 'pubsub-js';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/form/style.scss'; // css
 import './style.scss'; // css
@@ -55,6 +56,10 @@ export default class FormLogin extends BaseComponent {
       }
       e.preventDefault(); // запрещает срабатывание события "submit"
 
+      if (this.inSendProcess) {
+        return;
+      }
+
       const emailStatus = this.components.inputEmail.validation();
       const passwordStatus = this.components.inputPassword.validation();
 
@@ -76,7 +81,11 @@ export default class FormLogin extends BaseComponent {
 
       if (emailStatus.isValid
       && passwordStatus.isValid) {
-        console.log('submit');
+        this.formDisable();
+        PubSub.publish('form-login-data', {
+          email: this.components.inputEmail.getData(),
+          password: this.components.inputPassword.getData(),
+        });
       }
     }
   }
@@ -100,6 +109,18 @@ export default class FormLogin extends BaseComponent {
       return;
     }
     document.activeElement.blur();
+  }
+
+  formDisable() {
+    this.inSendProcess = true;
+    this.components.inputEmail.disable();
+    this.components.inputPassword.disable();
+  }
+
+  formEnable() {
+    this.inSendProcess = false;
+    this.components.inputEmail.enable();
+    this.components.inputPassword.enable();
   }
 
 

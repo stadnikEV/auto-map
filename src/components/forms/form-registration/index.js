@@ -1,3 +1,4 @@
+import PubSub from 'pubsub-js';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/form/style.scss'; // css
 import './style.scss'; // css
@@ -34,6 +35,7 @@ export default class FormRegistration extends BaseComponent {
 
     this.onClick = this.onClick.bind(this);
     this.addEvents();
+    this.addEvents();
   }
 
 
@@ -60,6 +62,10 @@ export default class FormRegistration extends BaseComponent {
         return;
       }
       e.preventDefault(); // запрещает срабатывание события "submit"
+
+      if (this.inSendProcess) {
+        return;
+      }
 
       const nameStatus = this.components.inputName.validation();
       const emailStatus = this.components.inputEmail.validation();
@@ -89,7 +95,11 @@ export default class FormRegistration extends BaseComponent {
 
       if (emailStatus.isValid
       && passwordStatus.isValid) {
-        console.log('submit');
+        PubSub.publish('form-registration-data', {
+          userName: this.components.inputName.getData(),
+          email: this.components.inputEmail.getData(),
+          password: this.components.inputPassword.getData(),
+        });
       }
     }
   }
@@ -118,6 +128,21 @@ export default class FormRegistration extends BaseComponent {
       return;
     }
     document.activeElement.blur();
+  }
+
+
+  formDisable() {
+    this.inSendProcess = true;
+    this.components.inputName.disable();
+    this.components.inputEmail.disable();
+    this.components.inputPassword.disable();
+  }
+
+  formEnable() {
+    this.inSendProcess = false;
+    this.components.inputName.enable();
+    this.components.inputEmail.enable();
+    this.components.inputPassword.enable();
   }
 
 

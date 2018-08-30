@@ -6,6 +6,10 @@ export default class InputEmail extends BaseComponent {
     this.eventsPubSub = {};
   }
 
+  getData() {
+    return this.elements.input.value;
+  }
+
   backlightValid({ isValid }) {
     if (isValid) {
       this.elements.input.classList.remove('input_invalid');
@@ -16,5 +20,13 @@ export default class InputEmail extends BaseComponent {
 
   setFocus() {
     this.elements.input.focus();
+  }
+
+  disable() {
+    this.elements.input.setAttribute('disabled', '');
+  }
+
+  enable() {
+    this.elements.input.removeAttribute('disabled', '');
   }
 }
