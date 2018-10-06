@@ -1,7 +1,8 @@
 import PubSub from 'pubsub-js';
-import simbiozApi from 'simbioz-api';
+import simbiozApi from 'simbioz-api/<%applicationName%>-api';
 import getAllowedRouteHash from './get-allowed-route-hash';
 import isCorrectHash from './is-correct-hash';
+
 
 const initRouter = () => {
   if (window.router) {
@@ -17,6 +18,7 @@ const initRouter = () => {
 
     onHashChange() {
       const currentRouteHash = this.getRouteHash();
+
       if (!isCorrectHash({ currentRouteHash })) {
         this.setRouteHash({ routeHash: 'badHash' });
         return;
@@ -33,17 +35,24 @@ const initRouter = () => {
       });
 
       if (!isAllowedRouteHash) {
+        if (allowedRouteHash.length === 0) {
+          return;
+        }
         this.setRouteHash({ routeHash: allowedRouteHash[0] });
         return;
       }
 
+      if (this.lastRouteHash === currentRouteHash) {
+        return;
+      }
+      this.lastRouteHash = currentRouteHash;
       PubSub.publish('routeHashChange', { routeHash: currentRouteHash });
     }
 
     initRouteHash() {
       simbiozApi.userStatus()
-        .then((userStatus) => {
-          this.userStatus = userStatus;
+        .then((response) => {
+          this.userStatus = response.status;
 
           this.onHashChange();
         })

@@ -4,6 +4,7 @@ export default ({ userStatus }) => {
   if (userStatus === 'login') {
     allowedRouteHash = [
       'application',
+      'application/search',
       'badHash',
     ];
   }

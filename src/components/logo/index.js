@@ -1,5 +1,5 @@
 import BaseComponent from 'components/__shared/base-component';
-import imgDriver from './img/driver.svg'; // svg
+import imgDriver from './img/<%applicationName%>.svg'; // svg
 import template from './template.hbs'; // template
 import './style.scss'; // css
 

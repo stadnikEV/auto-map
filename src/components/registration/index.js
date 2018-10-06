@@ -1,7 +1,7 @@
 import PubSub from 'pubsub-js';
 import router from 'router';
-import simbiozApi from 'simbioz-api';
-import HttpError from 'utils/http-error';
+import simbiozApi from 'simbioz-api/<%applicationName%>-api';
+import HttpError from 'utils/http-error.js';
 import BaseComponent from 'components/__shared/base-component';
 import 'components/__shared/login-registration/style.scss'; // css
 import FormRegistration from '../forms/form-registration';
@@ -39,11 +39,12 @@ class Registration extends BaseComponent {
 
   onSendData(msg, { userName, email, password }) {
     this.components.formRegistration.formDisable();
-    simbiozApi.registration({ userName, email, password })
+    simbiozApi.registration({
+      data: { userName, email, password },
+    })
       .then(() => {
         router.setRouteHash({ routeHash: 'application' });
         router.setUserStatus('login');
-        console.log('аккаунт создан');
       })
       .catch((err) => {
         this.components.formRegistration.formEnable();

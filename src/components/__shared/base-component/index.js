@@ -6,18 +6,26 @@ export default class BaseComponent {
     this.elements = {};
   }
 
-  show({ el }) {
+  show() {
+    this.el.classList.remove('hidden');
+  }
+
+  hide() {
+    this.el.classList.add('hidden');
+  }
+
+  showElem({ el }) {
     el.classList.remove('hidden');
   }
 
-  hide({ el }) {
+  hideElem({ el }) {
     el.classList.add('hidden');
   }
 
   unsubscribe() {
     const evetsNames = Object.keys(this.eventsPubSub);
-    evetsNames.forEach((evetsName) => {
-      PubSub.unsubscribe(this.eventsPubSub[evetsName]);
+    evetsNames.forEach((eventName) => {
+      PubSub.unsubscribe(this.eventsPubSub[eventName]);
     });
   }
 

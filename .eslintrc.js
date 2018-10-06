@@ -12,6 +12,13 @@ module.exports = {
   },
   "parser": "babel-eslint",
   "rules": {
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "import/no-unresolved": [2, { ignore: ['<%applicationName%>'] }],
+    "import/extensions": [
+      {
+        "<extension>": "never",
+      }
+    ],
     "no-new": "off",
     "class-methods-use-this": ["off"],
     "strict": 0,
